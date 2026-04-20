@@ -2,6 +2,8 @@ const express = require('express');
 const CustomerModel = require('../models/CustomerModel');
 const authMiddleware = require('../middleware/authMiddleware'); // se existir, caso contrário comente ou remova
 const router = express.Router();
+const validate = require('../middleware/validate');
+const { createCustomerSchema, updateCustomerSchema } = require('../validations/customerValidation');
 
 // Aplica autenticação em todas as rotas (opcional, comente se não quiser)
 // router.use(authMiddleware);
@@ -47,12 +49,10 @@ router.get('/:id', async (req, res) => {
 });
 
 // Criar novo cliente
-router.post('/', async (req, res) => {
+router.post('/', validate(createCustomerSchema), async (req, res) => {
   try {
     const { name, email, phone, address, nif } = req.body;
-    if (!name || !email) {
-      return res.status(400).json({ error: 'Nome e email são obrigatórios' });
-    }
+
     const newCustomer = await CustomerModel.create(name, email, phone, address, nif);
     res.status(201).json(newCustomer);
   } catch (error) {
@@ -65,7 +65,7 @@ router.post('/', async (req, res) => {
 });
 
 // Atualizar cliente
-router.put('/:id', async (req, res) => {
+router.put('/:id', validate(updateCustomerSchema), async (req, res) => {
   try {
     const { id } = req.params;
     const { name, email, phone, address, nif } = req.body;

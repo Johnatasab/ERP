@@ -45,8 +45,18 @@ router.get('/:id', async (req, res) => {
 // Criar produto
 router.post('/', async (req, res) => {
   try {
-    const { name, description, selling_price, category, image_url } = req.body;
-    const newProduct = await ProductModel.create(name, description, selling_price, category, image_url);
+    const { name, description, category, color, size, weight, supplier, initial_stock, unit_cost,  selling_price, profit_margin, image_url } = req.body;
+    if (!name || !selling_price) {
+      return res.status(400).json({ error: 'Nome e preço de venda são obrigatórios'});
+    }
+
+    const newProduct = await ProductModel.create({ name, description, category, color, size, weight, supplier,
+      initial_stock: initial_stock || 0,
+      unit_cost: unit_cost || 0,
+      selling_price,
+      profit_margin: profit_margin || 0,
+      image_url
+    });
     res.status(201).json(newProduct);
   } catch (error) {
     console.error(error);
@@ -57,8 +67,10 @@ router.post('/', async (req, res) => {
 // Atualizar produto
 router.put('/:id', async (req, res) => {
   try {
-    const { name, description, selling_price, category, image_url } = req.body;
-    const updated = await ProductModel.update(req.params.id, name, description, selling_price, category, image_url);
+    const { id }  = req.params;
+    const { name, description, category, color, size, weight, supplier, initial_stock, unit_cost, selling_price, profit_margin, image_url, stock } = req.body;
+    const updated = await ProductModel.update( id, {name, description, category, color, size, weight, supplier, initial_stock, unit_cost, selling_price, profit_margin, image_url, stock});
+    
     if (!updated) return res.status(404).json({ error: 'Produto não encontrado' });
     res.json(updated);
   } catch (error) {

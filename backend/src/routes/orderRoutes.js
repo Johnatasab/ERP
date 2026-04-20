@@ -5,6 +5,7 @@ const OrderModel = require('../models/OrderModel');
 const TransactionModel = require('../models/TransactionModel');
 const PDFDocument = require('pdfkit');
 const ExcelJS = require('exceljs');
+const ProductModel = require('../models/ProductModel'); 
 
 // ==================== ROTA DE EXPORTAÇÃO (DEVE VIR ANTES DO /:id) ====================
 router.get('/export', async (req, res) => {
@@ -187,18 +188,25 @@ router.post('/', async (req, res) => {
 });
 
 router.post('/:id/items', async (req, res) => {
-  try {
-    const orderId = req.params.id;
-    const { product_id, quantity, unit_price } = req.body;
-    if (!product_id || !quantity || !unit_price) {
-      return res.status(400).json({ error: 'Produto, quantidade e preço unitário são obrigatórios' });
-    }
-    const item = await OrderModel.addOrderItem(orderId, product_id, quantity, unit_price);
-    res.status(201).json(item);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Erro ao adicionar item' });
+  const orderId = req.params.id;
+  const { product_id, quantity, unit_price } = req.body;
+  
+  //Verificar stock disponível
+  const product = await ProductModel.findById(product_id);
+  if (!product) return res.status(404).json({ error: 'Produto não encontrado'});
+  if (product.stock < quantity){
+    return res.status(400).json({ error: `Stock insuficiente. Disponível: ${product.stock}`});
   }
+
+  //Atualizar stock
+  const update = await ProductModel.updateStock(product_id, quantity);
+  if (!update) {
+    return res.status(400).json({ error: 'Erro ao atualizar stock'});
+  }
+
+  //Adicionar item à encomenda
+  const item = await OrderModel.addOrderItem(orderId, product_id, quantity, unit_price);
+  res.status(201).json(item);
 });
 
 router.patch('/:id/status', async (req, res) => {
@@ -256,9 +264,21 @@ router.patch('/:id/payment', async (req, res) => {
 
 router.delete('/:id', async (req, res) => {
   try {
-    const deleted = await OrderModel.remove(req.params.id);
-    if (!deleted) return res.status(404).json({ error: 'Encomenda não encontrada' });
-    res.json({ message: 'Encomenda eliminada', id: deleted.id });
+    const orderId = req.params.id;
+    // Buscar a encomenda com os itens (inclui produtos e quantidades)
+    const order = await OrderModel.findById(orderId);
+    if (!order) return res.status(404).json({ error: 'Encomenda não encontrada' });
+
+    // Repor stock de cada produto (adicionar de volta a quantidade)
+    if (order.items && order.items.length > 0) {
+      for (const item of order.items) {
+        await ProductModel.updateStock(item.product_id, -item.quantity); // NOTA: usamos -quantity para adicionar stock
+      }
+    }
+
+    // Eliminar a encomenda
+    const deleted = await OrderModel.remove(orderId);
+    res.json({ message: 'Encomenda eliminada e stock reposto', id: deleted.id });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Erro ao eliminar encomenda' });

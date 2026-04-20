@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const UserModel = require('../models/UserModel');
 const authMiddleware = require('../middleware/authMiddleware'); // se existir, senão cria
 
+
 const router = express.Router();
 
 // Aplica middleware de autenticação a todas as rotas deste ficheiro
