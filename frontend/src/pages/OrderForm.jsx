@@ -102,11 +102,13 @@ function OrderForm() {
       });
 
       for (const item of items) {
-        await addOrderItem(order.id, {
-          product_id: item.product_id,
-          quantity: item.quantity,
-          unit_price: item.unit_price,
-        });
+        try {
+          await addOrderItem(order.id, { product_id: item.product_id, quantity: item.quantity, unit_price: item.unit_price });
+        } catch (err) {
+          const msg = err.response?.data?.error || 'Erro ao adicionar produto';
+          alert(msg);
+          return; // interrompe o processo (opcional)
+        }
       }
 
       navigate('/orders');

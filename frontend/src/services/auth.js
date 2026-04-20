@@ -1,4 +1,4 @@
-import axios from 'axios';
+import api from './api';
 
 //Base URL da API (backend)
 const API_URL = 'http://localhost:3000/api/auth';
@@ -6,13 +6,13 @@ const API_URL = 'http://localhost:3000/api/auth';
 //Função de registro
 export const register = async (name, email, password) => {
     //Envia um POST para / register com os dados
-    const response = await axios.post(`${API_URL}/register`, {name, email, password});
+    const response = await api.post(`${API_URL}/register`, {name, email, password});
     return response.data; //Retorna {message, user}
 };
 
 //Função de login
 export const login = async (email, password) => {
-    const response = await axios.post(`${API_URL}/login`, {email, password});
+    const response = await api.post('/auth/login', {email, password});
     //Se o login for bem-sucedido, guarda o token e os dados do user no localStorage
     if (response.data.token) {
         localStorage.setItem('token', response.data.token);
@@ -22,7 +22,8 @@ export const login = async (email, password) => {
 };
 
 //Função para fazer logout
-export const logout = () => {
+export const logout = async () => {
+    await api.post('/auth/logout');
     localStorage.removeItem('token');
     localStorage.removeItem('user');
 };

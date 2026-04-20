@@ -12,6 +12,8 @@ import OrderForm from './pages/OrderForm';
 import OrderDetails from './pages/OrderDetails';
 import Financeiro from './pages/Financeiro';
 import Profile from './pages/Profile';
+import { ThemeProvider } from './context/ThemeContext';
+
 
 // Componente de layout que inclui a sidebar
 function Layout({ children }) {
@@ -38,22 +40,24 @@ const ProtectedRoute = ({ children }) => {
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-        <Route path="/customers" element={<ProtectedRoute><Customers /></ProtectedRoute>} />
-        <Route path="/products" element={<ProtectedRoute><Products /></ProtectedRoute>} />
-        <Route path="/raw-materials" element={<ProtectedRoute><RawMaterials /></ProtectedRoute>} />
-        <Route path="/" element={<Navigate to="/dashboard" />} />
-        <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
-        <Route path="/orders/new" element={<ProtectedRoute><OrderForm /></ProtectedRoute>} />
-        <Route path="/orders/:id" element={<ProtectedRoute><OrderDetails /></ProtectedRoute>} />
-        <Route path="/finance" element={<ProtectedRoute><Financeiro /></ProtectedRoute>} />
-        <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-      </Routes>
-    </BrowserRouter>
+    <ThemeProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route path="/customers" element={<ProtectedRoute><Customers /></ProtectedRoute>} />
+          <Route path="/products" element={<ProtectedRoute><Products /></ProtectedRoute>} />
+          <Route path="/raw-materials" element={<ProtectedRoute><RawMaterials /></ProtectedRoute>} />
+          <Route path="/" element={<Navigate to="/dashboard" />} />
+          <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
+          <Route path="/orders/new" element={<ProtectedRoute><OrderForm /></ProtectedRoute>} />
+          <Route path="/orders/:id" element={<ProtectedRoute><OrderDetails /></ProtectedRoute>} />
+          <Route path="/finance" element={<ProtectedRoute><Financeiro /></ProtectedRoute>} />
+          <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+        </Routes>
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }
 
