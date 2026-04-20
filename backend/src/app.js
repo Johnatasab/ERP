@@ -6,7 +6,12 @@ const compression = require('compression');
 const rateLimit = require('express-rate-limit');
 const hpp = require('hpp');
 require('./db'); // ligação à BD
-const env = require('./config/env');
+
+const env = {
+  NODE_ENV: process.env.NODE_ENV || 'development',
+  PORT: process.env.PORT || 3000,
+};
+
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const fs = require('fs');

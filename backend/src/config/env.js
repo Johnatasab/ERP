@@ -1,12 +1,8 @@
-const { cleanEnv, port, str } = require('envalid');
+const { cleanEnv, port, str, url } = require('envalid');
 
 module.exports = cleanEnv(process.env, {
-    PORT: port({ default: 300 }),
-    DB_HOST: str(),
-    DB_PORT: port({ default: 5432 }),
-    DB_NAME: str(),
-    DB_USER: str(),
-    DB_PASS: str(),
-    JWT_SECRET: str(),
-    NODE_ENV: str({ choices: ['development', 'production', 'test'], default: 'development' }),
+  NODE_ENV: str({ choices: ['development', 'production', 'test'], default: 'development' }),
+  PORT: port({ default: 3000 }),
+  DATABASE_URL: url(),
+  JWT_SECRET: str(),
 });
