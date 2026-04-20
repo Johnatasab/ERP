@@ -1,11 +1,15 @@
+const OrderModel = require('../models/OrderModel');
+const TransactionModel = require('../models/TransactionModel');
+const ProductModel = require('../models/ProductModel');
+
 const express = require('express');
 const router = express.Router();
 const pool = require('../db');
-const OrderModel = require('../models/OrderModel');
-const TransactionModel = require('../models/TransactionModel');
+
+
 const PDFDocument = require('pdfkit');
 const ExcelJS = require('exceljs');
-const ProductModel = require('../models/ProductModel'); 
+ 
 
 // ==================== ROTA DE EXPORTAÇÃO (DEVE VIR ANTES DO /:id) ====================
 router.get('/export', async (req, res) => {
