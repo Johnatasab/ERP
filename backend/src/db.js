@@ -11,7 +11,9 @@ if (!connectionString) {
 
 const pool = new Pool({
   connectionString,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : 
+  false,
+  family: 4
 });
 
 pool.query('SELECT NOW()')
